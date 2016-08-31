@@ -26,7 +26,7 @@ class Population(object):
     ):
         self.species = species
         self.fitness_fn = fitness_fn
-        self.individuals = [ self.species.random_individual() for i in xrange(size) ]
+        self.individuals = [ self.species.random_individual() for i in range(size) ]
 
     def generation(self):
         "Run through a generation"
@@ -53,7 +53,7 @@ class Population(object):
         else: num_children = len(self.individuals)
 
         from random import choice
-        self.children = [ self.species.mate(choice(self.parents), choice(self.parents)) for i in xrange(num_children) ]
+        self.children = [ self.species.mate(choice(self.parents), choice(self.parents)) for i in range(num_children) ]
 
     def combine_generations(self):
         self.individuals = list(chain(self.parents,self.children))

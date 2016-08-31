@@ -27,7 +27,7 @@ def k_fold_cross_validation(X, K, randomise = False):
     if K < 2:
         raise ValueError('Must use at least 2 cross-validation groups.')
     if randomise: from random import shuffle; X=list(X); shuffle(X)
-    for k in xrange(K):
+    for k in range(K):
         training = [x for i, x in enumerate(X) if i % K != k]
         validation = [x for i, x in enumerate(X) if i % K == k]
         yield training, validation
@@ -105,8 +105,8 @@ def matrix_is_close( A, B, eps = 1e-3 ):
                 'A and B must have same shape: %s, %s'
                 % ( str(A.shape), str(B.shape) )
         )
-    for i in xrange( A.shape[0] ):
-        for j in xrange( A.shape[1] ):
+    for i in range( A.shape[0] ):
+        for j in range( A.shape[1] ):
             if not check_is_close( A[i,j], B[i,j], tol = eps ):
                 return False
     return True
@@ -122,12 +122,12 @@ def array_is_close( A, B, eps = 1e-3 ):
 def check_matrix_is_close( A, B, message, eps = 1e-3 ):
     """Raises error and prints message if matrices are not close"""
     if not matrix_is_close( A, B, eps ):
-        print '%s:\n%s\nand\n%s\ndiffer by:\n%s' % (
+        print('%s:\n%s\nand\n%s\ndiffer by:\n%s' % (
                 message,
                 str( A ),
                 str( B ),
                 str( A - B )
-        )
+        ))
         raise RuntimeError( '%s' % message )
 
 
@@ -149,8 +149,7 @@ def check_gradients( f, fprime, x, eps = 1e-4 ):
     norm = scipy.sqrt( numpy.dot( diff, diff ) )
     if norm > eps:
         raise \
-                RuntimeError, \
-                (
+                RuntimeError((
                         'Gradient does not match approximation from function\n'
                         + 'Difference (norm): %f\n'
                         + 'x: %s\n'
@@ -163,7 +162,7 @@ def check_gradients( f, fprime, x, eps = 1e-4 ):
                         calculated,
                         approximation,
                         diff
-                )
+                ))
 
 def plot_line( start, end, *arguments, **keywords ):
     """Plot a line from start to end"""

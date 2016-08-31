@@ -5,9 +5,9 @@
 import unittest
 
 def suite():
-    import distribution_test
+    from . import distribution_test
     #import mvn_mixture_test
-    import utils_test
+    from . import utils_test
     
     # import infpy.variational.test
     import infpy.decision.test

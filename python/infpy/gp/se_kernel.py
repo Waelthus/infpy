@@ -3,7 +3,7 @@
 #
 
 
-from real_kernel import *
+from .real_kernel import *
 import numpy, math
 
 class SquaredExponentialKernel( RealKernel ):

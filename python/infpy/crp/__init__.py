@@ -3,6 +3,8 @@
 #
 
 import logging
+from functools import reduce
+import imp
 logging.basicConfig(level=logging.DEBUG)
 _logger = logging.getLogger(__name__)
 
@@ -88,7 +90,7 @@ class CRP(object):
                 p[t] = m[t] * tablelikelihoodfn(n, t)
         p[T] = self.alpha * tablelikelihoodfn(n, -1)
         # Choose a table to sit at
-        t = npy.random.choice(range(T + 1), p=p/p.sum())
+        t = npy.random.choice(list(range(T + 1)), p=p/p.sum())
         # _logger.debug('sampletable(): choice = %d; weights = %s', t, p)
         # If we chose a new table, we must create it unless we can
         # reuse an old empty one
@@ -145,7 +147,7 @@ class DPExpFam(object):
         "Is this DPExpFam self consistent?"
         if not super(DPExpFam, self).isconsistent():
             return False
-        psi = [self.tau.copy() for t in xrange(len(self.psi))]
+        psi = [self.tau.copy() for t in range(len(self.psi))]
         for zn in self.z:
             if -1 != zn:
                 psi[zn] = self.F.add_observations_to_prior(self.x[n],
@@ -218,7 +220,7 @@ class DPMixture(DPExpFam):
 
     def __init__(self, alpha, F, x, tau):
         super(DPMixture, self).__init__(alpha, F, x, tau)
-        for n in xrange(self.N):
+        for n in range(self.N):
             self.sampleandsit(n)
 
     def sample(self):
@@ -264,7 +266,7 @@ class ContextClusterMixture(object):
     """
 
     def __init__(self, family, x, tau, alpha, beta):
-        lengths = map(len, x)
+        lengths = list(map(len, x))
         if not lengths:
             raise ValueError('No contexts')
         if max(lengths) != min(lengths):
@@ -282,7 +284,7 @@ class ContextClusterMixture(object):
 
     def _initialisestate(self):
         "Initialise the state sitting every datum down."
-        for n in xrange(self.N):
+        for n in range(self.N):
             self.sampleandsit(n)
 
     @property
@@ -343,7 +345,7 @@ class ContextClusterMixture(object):
         def likelihoods(self, n):
             "The likelihood of the n'th datum for each table."
             lls = npy.empty(self.crp.T + 1)
-            for t in xrange(self.crp.T):
+            for t in range(self.crp.T):
                 if self.crp.m > 0:
                     lls[t] = self.tableloglikelihood(n, t)
                 else:
@@ -365,8 +367,7 @@ class ContextClusterMixture(object):
         def __init__(self, contexts, n):
             self.contexts = contexts
             self.n = n
-            self.likelihoods = map(lambda context: context.likelihoods(n),
-                                   contexts)
+            self.likelihoods = [context.likelihoods(n) for context in contexts]
 
         def tablelikelihood(self, n, t0):
             """The likelihood for datum n sitting at table t0 in
@@ -402,7 +403,7 @@ if '__main__' == __name__:
 
     # Test the Normal-Gamma / Gaussian conjugate prior
     import infpy.exp
-    reload(infpy.exp)
+    imp.reload(infpy.exp)
     import infpy.exp as exp
     import pylab as pyl
     F = exp.GaussianConjugatePrior()
@@ -430,9 +431,9 @@ if '__main__' == __name__:
 
     # Test the CRP mixture model
     import infpy.exp
-    reload(infpy.exp)
+    imp.reload(infpy.exp)
     import infpy.crp
-    reload(infpy.crp)
+    imp.reload(infpy.crp)
     import infpy.crp as crp
     import infpy.exp as exp
     import numpy as npy
@@ -447,7 +448,7 @@ if '__main__' == __name__:
     tau = F.prior.eta((prioralpha, priorbeta, priormu, priorlambda))
     mixture = crp.CRPMixture(crpalpha, F, T, tau)
     K = []
-    for i in xrange(1000):
+    for i in range(1000):
         mixture.sample()
         K.append(len(npy.unique(mixture.crp.z)))
 
@@ -455,7 +456,7 @@ if '__main__' == __name__:
     import logging
     logging.basicConfig(level=logging.DEBUG)
     import infpy.exp
-    reload(infpy.exp)
+    imp.reload(infpy.exp)
     import infpy.exp as exp
     import numpy as npy
     F = exp.GaussianConjugatePrior()
@@ -464,7 +465,7 @@ if '__main__' == __name__:
         npy.array([0,  0,  0,  1,  1,  1]),
         npy.array([0,  0,  1,  1, -1, -1]),
         ]
-    T = map(F.likelihood.T, x)  # Convert to exponential family suff. stats
+    T = list(map(F.likelihood.T, x))  # Convert to exponential family suff. stats
     alpha = 1.
     beta = 1.
     prioralpha = 100.
@@ -473,11 +474,11 @@ if '__main__' == __name__:
     priorlambda = 100.
     tau = F.prior.eta((prioralpha, priorbeta, priormu, priorlambda))
     import infpy.crp
-    reload(infpy.crp)
+    imp.reload(infpy.crp)
     ccm = infpy.crp.ContextClusterMixture([F] * len(x), T, [tau] * len(x),
                                           alpha, beta)
     K = []
-    for i in xrange(1000):
+    for i in range(1000):
         ccm.sample()
         K.append(npy.array(ccm.G0.z))
     K = npy.asarray(K)

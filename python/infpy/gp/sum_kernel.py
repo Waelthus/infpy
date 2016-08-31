@@ -3,7 +3,7 @@
 #
 
 
-from kernel import *
+from .kernel import *
 import infpy
 import numpy, math
 
@@ -17,8 +17,8 @@ class IndexMixer( object ):
         self.o2 = o2
 
     def _check_key( self, key ):
-        if int != type(key): raise TypeError, 'Need integral key'
-        if 0 > key >= len(self): raise IndexError, 'Index out of range'
+        if int != type(key): raise TypeError('Need integral key')
+        if 0 > key >= len(self): raise IndexError('Index out of range')
 
     def _get_container_and_index( self, key ):
         self._check_key( key )
@@ -44,7 +44,7 @@ class IndexMixer( object ):
         def __init__( self, mixer ):
             self.mixer = mixer
             self.i = 0
-        def next( self ):
+        def __next__( self ):
             self.i += 1
             if self.i > len(self.mixer): raise StopIteration
             return self.mixer[self.i-1]
